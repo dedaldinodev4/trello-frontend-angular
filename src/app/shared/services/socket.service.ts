@@ -1,5 +1,6 @@
 import { Injectable } from "@angular/core";
 import { io, Socket } from 'socket.io-client'
+import { Observable } from "rxjs";
 import { IUserCurrentDTO } from "src/app/auth/dtos/UserAuthDTO";
 import { environment } from "src/environments/environment";
 
@@ -29,4 +30,17 @@ export class SocketService {
         }
         this.socket.emit(eventName, message);
     }
+
+    listen<T>(eventName: string): Observable<T> {
+        const socket = this.socket;
+        if (!socket) {
+          throw new Error('Socket connection is not established');
+        }
+    
+        return new Observable((subscriber) => {
+          socket.on(eventName, (data) => {
+            subscriber.next(data);
+          });
+        });
+      }
 }

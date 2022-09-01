@@ -13,7 +13,8 @@ export class SocketService {
         this.socket = io(environment.sockectUrl, {
             auth: {
                 token: currentUser.token,
-            }
+            },
+            transports: ['websocket', 'polling', 'flashsocket'],
         })
     }
 

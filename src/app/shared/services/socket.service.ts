@@ -14,7 +14,6 @@ export class SocketService {
             auth: {
                 token: currentUser.token,
             },
-            transports: ['websocket', 'polling', 'flashsocket'],
         })
     }
 

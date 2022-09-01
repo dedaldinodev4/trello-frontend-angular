@@ -58,13 +58,35 @@ export class BoardService {
           return column;
         });
         this.columns$.next(updatedColumns);
-      }
+    }
     
     deleteColumn(columnId: string): void {
         const updatedColumns = this.columns$
           .getValue()
           .filter((column) => column.id !== columnId);
         this.columns$.next(updatedColumns);
+    }
+
+    updateTask(updatedTask: ITask): void {
+        const updatedTasks = this.tasks$.getValue().map((task) => {
+          if (task.id === updatedTask.id) {
+            return { 
+                ...task, 
+                title: updatedTask.title,
+                description: updatedTask.description,
+                columnId: updatedTask.columnId, 
+            };
+          }
+          return task;
+        });
+        this.tasks$.next(updatedTasks);
+    }
+    
+    deleteTask(taskId: string): void {
+        const updatedTasks = this.tasks$
+          .getValue()
+          .filter((task) => task.id !== taskId);
+        this.tasks$.next(updatedTasks);
     }
 
 

@@ -8,13 +8,20 @@ import { InlineFormModule } from '../shared/modules/inline-form/inline-form.modu
 import { TopbarModule } from '../shared/modules/topbar/topbar.module';
 import { ColumnsService } from '../shared/services/columns.service';
 import { TaskService } from "../shared/services";
-
+import { ReactiveFormsModule } from '@angular/forms';
+import { TaskModalComponent } from "./components/task-modal/task-modal.component";
 
 const routes: Routes = [
     {
-        path: 'boards/:id',
+        path: 'boards/:boardId',
         component: BoardComponent,
         canActivate: [AuthGuard],
+        children: [
+            {
+              path: 'tasks/:taskId',
+              component: TaskModalComponent,
+            },
+        ],
     }
 ];
 
@@ -24,8 +31,9 @@ const routes: Routes = [
         RouterModule.forChild(routes),
         TopbarModule,
         InlineFormModule,
+        ReactiveFormsModule,
     ],
-    declarations: [ BoardComponent],
+    declarations: [ BoardComponent, TaskModalComponent ],
     providers: [
         BoardService, 
         ColumnsService, 

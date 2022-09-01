@@ -38,7 +38,7 @@ export class BoardComponent implements OnInit, OnDestroy {
     private columnsService: ColumnsService,
     private taskService: TaskService
   ) {
-    const boardId = this.route.snapshot.paramMap.get('id');
+    const boardId = this.route.snapshot.paramMap.get('boardId');
 
     if (!boardId) {
       console.log('Cant get boardID from url')
@@ -74,17 +74,13 @@ export class BoardComponent implements OnInit, OnDestroy {
 
   initializeListeners(): void {
     this.router.events.subscribe((event) => {
-      if (event instanceof NavigationStart) {
+      if (event instanceof NavigationStart && !event.url.includes('/boards/')) {
         this.boardService.leaveBoard(this.boardId);
       }
     });
 
-    this.socketService
-      .listen<IColumn>(EnumSokectEvent.columnsCreateSuccess)
-      .subscribe((column) => {
-        this.boardService.addColumn(column);
-      });
 
+      //*  Tasks Events *//
     this.socketService
       .listen<ITask>(EnumSokectEvent.tasksCreateSuccess)
       .pipe(takeUntil(this.unsubscribe$))
@@ -92,6 +88,21 @@ export class BoardComponent implements OnInit, OnDestroy {
         this.boardService.addTask(task);
       });
 
+    this.socketService
+      .listen<ITask>(EnumSokectEvent.tasksUpdateSuccess)
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((updatedTask) => {
+        this.boardService.updateTask(updatedTask);
+      });
+
+    this.socketService
+      .listen<string>(EnumSokectEvent.tasksDeleteSuccess)
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((taskId) => {
+        this.boardService.deleteTask(taskId);
+      });
+
+    //*  Boards Events *//
     this.socketService
       .listen<IBoard>(EnumSokectEvent.boardsUpdateSuccess)
       .pipe(takeUntil(this.unsubscribe$))
@@ -105,6 +116,14 @@ export class BoardComponent implements OnInit, OnDestroy {
       .subscribe(() => {
         this.router.navigateByUrl('/boards');
       });
+
+      //* Columns Events *//
+    this.socketService
+      .listen<IColumn>(EnumSokectEvent.columnsCreateSuccess)
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((column) => {
+        this.boardService.addColumn(column);
+    });
 
     this.socketService
       .listen<IColumn>(EnumSokectEvent.columnsUpdateSuccess)
@@ -136,7 +155,6 @@ export class BoardComponent implements OnInit, OnDestroy {
   }
 
   createColumn(title: string): void {
-    console.log('Title: ', title)
     const columnInput: IColumnRequest = {
       title,
       boardId: this.boardId,
@@ -169,7 +187,9 @@ export class BoardComponent implements OnInit, OnDestroy {
   }
 
   deleteColumn(columnId: string): void {
-    this.columnsService.deleteColumn(this.boardId, columnId);
+    if(confirm('Are you sure you want to delete the column on board?')) {
+      this.columnsService.deleteColumn(this.boardId, columnId);
+    }
   }
 
   updateColumnName(columnName: string, columnId: string): void {
@@ -177,5 +197,11 @@ export class BoardComponent implements OnInit, OnDestroy {
       title: columnName,
     });
   }
+
+  openTask(taskId: string): void {
+    this.router.navigate(['boards', this.boardId, 'tasks', taskId]);
+  }
+
+
 
 }

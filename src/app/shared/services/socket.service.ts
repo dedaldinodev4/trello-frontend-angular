@@ -11,11 +11,11 @@ export class SocketService {
 
     setupSocketConnection(currentUser: IUserCurrentDTO): void {
         this.socket = io(environment.sockectUrl, {
-            "forceNew": true,
-            "reconnectionAttempts": Infinity,
-            "timeout": 10000,
-            "withCredentials": true,
-            "transports": ['websocket', 'polling', 'flashsocket'],
+            forceNew: true,
+            reconnectionAttempts: Infinity,
+            timeout: 10000,
+            withCredentials: true,
+            transports: ['websocket', 'polling', 'flashsocket'],
             auth: {
                 token: currentUser.token,
             },

@@ -11,6 +11,7 @@ export class SocketService {
 
     setupSocketConnection(currentUser: IUserCurrentDTO): void {
         this.socket = io(environment.sockectUrl, {
+            withCredentials: true,
             auth: {
                 token: currentUser.token,
             },
